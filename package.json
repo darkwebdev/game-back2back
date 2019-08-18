@@ -1,0 +1,10 @@
+{
+  "name": "back2back",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "gtibalt@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "kontra": "^6.2.3"
+  }
+}
