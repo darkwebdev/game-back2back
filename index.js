@@ -8,7 +8,7 @@ import {
 import Player from './player.js';
 import Enemy from './enemy.js';
 import Bullet from './bullet.js';
-import { range, findAllColliding } from './helpers.js';
+import { range, findColliding, findAllColliding } from './helpers.js';
 
 console.log('Initializing game engine...');
 
@@ -33,6 +33,7 @@ GameLoop({
             return s;
         });
 
+        // Colliding bullets & enemies
         const bullets = updatedSprites.filter(s => s.type === 'bullet');
         const enemies = updatedSprites.filter(s => s.type === 'enemy');
 
@@ -40,6 +41,28 @@ GameLoop({
             s.ttl = 0;
         });
 
+        // Player being hit
+        const player = updatedSprites.find(s => s.type === 'player');
+        const collidingEnemy = findColliding(player, enemies);
+
+        if (player && collidingEnemy) {
+            collidingEnemy.dx = 0;
+            collidingEnemy.dy = 0;
+            if (collidingEnemy.lastHit > 1) {
+                collidingEnemy.lastHit = 0;
+                player.hp -= collidingEnemy.damage;
+                console.log('HP:', player.hp);
+
+                if (player.hp <=0) {
+                    console.log('GAME OVER');
+                    player.ttl = 0;
+                }
+            } else {
+                collidingEnemy.lastHit += 1/60;
+            }
+        }
+
+        // Remove unused sprites
         sprites = updatedSprites.filter(s => s.isAlive());
 
         console.log('SPRITES', sprites.length);

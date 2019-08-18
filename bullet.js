@@ -14,6 +14,7 @@ export default player => {
         ttl: 50,
         width: 2,
         height: 2,
-        color: 'red'
+        color: 'red',
+        damage: 10
     });
 }

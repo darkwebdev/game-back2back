@@ -8,6 +8,9 @@ export default id => Sprite({
     dx: Math.random(),
     dy: Math.random(),
     radius: 10,
+    damage: 1,
+    hp: 10,
+    lastHit: 0,
     render() {
         this.context.strokeStyle = 'red';
         this.context.beginPath();

@@ -8,6 +8,8 @@ export default ({ id, canvas, pointer }) => Sprite({
     y: canvas.height / 2,
     radius: 5,
     rotation: 0,
+    weapon: 'Pistol',
+    hp: 20,
     update() {
         this.rotation = Math.atan2(pointer.y - this.y, pointer.x - this.x) * 180 / Math.PI;
     },
