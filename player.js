@@ -1,30 +1,40 @@
 import { Sprite } from './node_modules/kontra/kontra.mjs';
 import { degreesToRadians } from './helpers.js';
 
-export default ({ id, canvas, pointer }) => Sprite({
-    id,
-    type: 'player',
-    x: canvas.width / 2,
-    y: canvas.height / 2,
-    radius: 5,
-    rotation: 0,
-    weapon: 'Pistol',
-    hp: 20,
-    update() {
-        this.rotation = Math.atan2(pointer.y - this.y, pointer.x - this.x) * 180 / Math.PI;
-    },
-    render() {
-        this.context.save();
-        this.context.strokeStyle = 'blue';
-        this.context.translate(this.x, this.y);
-        this.context.rotate(degreesToRadians(this.rotation));
+export const Player = ({ id, x, y, pointer }) => new Promise((resolve, reject) => {
+    const image = new Image();
+    image.src = 'assets/gun.png';
+    image.onload = () => {
+        resolve(Sprite({
+            id,
+            type: 'player',
+            x,
+            y,
+            radius: 8,
+            rotation: 0,
+            anchor: { x: 0.5, y: 0.5 },
+            image,
+            weapon: 'Gun',
+            hp: 20,
+            update() {
+                this.rotation = Math.atan2(pointer.y - this.y, pointer.x - this.x);
+            }
+        }))
+    }
+});
 
-        this.context.beginPath();
-        this.context.moveTo(-3, -5);
-        this.context.lineTo(12, 0);
-        this.context.lineTo(-3, 5);
-        this.context.closePath();
-        this.context.stroke();
-        this.context.restore();
+export const Base = ({ id, x, y }) => new Promise((resolve, reject) => {
+    const image = new Image();
+    image.src = 'assets/base.png';
+    image.onload = () => {
+        resolve(Sprite({
+            id,
+            type: 'base',
+            x,
+            y,
+            radius: 10,
+            anchor: { x: 0.5, y: 0.5 },
+            image
+        }))
     }
 });

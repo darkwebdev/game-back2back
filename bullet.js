@@ -2,8 +2,8 @@ import { Sprite } from './node_modules/kontra/kontra.mjs';
 import { degreesToRadians } from './helpers.js';
 
 export default player => {
-    const cos = Math.cos(degreesToRadians(player.rotation));
-    const sin = Math.sin(degreesToRadians(player.rotation));
+    const cos = Math.cos(player.rotation);
+    const sin = Math.sin(player.rotation);
 
     return Sprite({
         type: 'bullet',

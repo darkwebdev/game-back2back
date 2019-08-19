@@ -1,6 +1,7 @@
 import { Sprite } from './node_modules/kontra/kontra.mjs';
+import { range } from './helpers.js';
 
-export default id => Sprite({
+export const Enemy = id => Sprite({
     id,
     type: 'enemy',
     x: Math.random()*100,
@@ -18,3 +19,10 @@ export default id => Sprite({
         this.context.stroke();
     }
 });
+
+export const spawnEnemies = n =>
+    range(n).map(n => {
+        const id = `enemy-${n}`;
+        console.log(`Creating new enemy ${id}...`);
+        return Enemy(id);
+    });
