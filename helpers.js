@@ -1,33 +1,38 @@
-export function degreesToRadians(degrees) {
-    return degrees * Math.PI / 180;
-}
+// Pythagorean law
+export const normalized = (x, y) => Math.sqrt((x * x) + (y * y));
 
-export function range(n) {
-    return [...Array(n).keys()];
-}
+export const degreesToRadians = degrees => degrees * Math.PI / 180;
 
-export function isColliding(sprite1, sprite2) {
+export const range = n => [...Array(n).keys()];
+
+export const isColliding = (sprite1, sprite2) => {
     const dx = sprite1.x - sprite2.x;
     const dy = sprite1.y - sprite2.y;
     const width1 = sprite1.width || sprite1.radius * 2;
     const width2 = sprite2.width || sprite2.radius * 2;
 
     return Math.sqrt(dx * dx + dy * dy) < width1 / 2 + width2;
-}
+};
 
-export function findColliding(sprite1, sprites2) {
-    return sprites2.find(sprite2 => isColliding(sprite1, sprite2));
-}
+export const findFirstColliding = (sprite1, sprites2) =>
+    sprites2.find(sprite2 => isColliding(sprite1, sprite2));
 
-export function findAllColliding(sprites1, sprites2) {
-    return sprites1.reduce((allColliding, sprite1) => {
-        const colliding = findColliding(sprite1, sprites2);
+export const findMultiColliding = (sprite1, sprites2) =>
+    sprites2.filter(sprite2 => isColliding(sprite1, sprite2));
 
-        if (colliding) {
+export const findAllColliding = (sprites1, sprites2) =>
+    sprites1.reduce((allColliding, sprite1) => {
+        const multiColliding = findMultiColliding(sprite1, sprites2);
+
+        if (multiColliding) {
             allColliding.push(sprite1);
-            allColliding.push(colliding);
+            allColliding.push(...multiColliding);
         }
 
         return allColliding;
     }, []);
-}
+
+export const stopSprite = sprite => {
+    sprite.dx = 0;
+    sprite.dy = 0;
+};

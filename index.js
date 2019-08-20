@@ -1,14 +1,14 @@
 import {
-    GameLoop,
-    init,
-    initPointer,
-    onPointerDown,
-    pointer
+    GameLoop, init,
+    emit,
+    initPointer, onPointerDown, pointer
 } from './node_modules/kontra/kontra.mjs';
-import { Player, Base } from './player.js';
-import Bullet from './bullet.js';
-import { findAllColliding, findColliding } from './helpers.js';
-import { spawnEnemies } from './enemy.js';
+import { Player, Base, findPlayer } from './player.js';
+import { findAllColliding, findMultiColliding, stopSprite } from './helpers.js';
+import { findEnemies, spawnEnemies } from './enemy.js';
+import initReducer from './reducer.js';
+import { findBullets } from './bullet.js';
+import { ACTIONS } from './const.js'
 
 (async () => {
     console.log('Initializing game engine...');
@@ -18,6 +18,8 @@ import { spawnEnemies } from './enemy.js';
 
     let sprites = [];
     let waveSize = 5;
+
+    initReducer(sprites);
 
     // Player
 
@@ -35,65 +37,59 @@ import { spawnEnemies } from './enemy.js';
         pointer
     });
     sprites.push(player);
-    sprites.push(...(spawnEnemies(waveSize)));
+    sprites.push(...spawnEnemies({ number: waveSize, player }));
 
     onPointerDown((e, object) => {
-        console.log('FIRE');
-        const player = sprites.find(s => s.type === 'player');
-
-        sprites.push(Bullet(player));
+        emit(ACTIONS.FIRE);
     });
 
     GameLoop({
         update() {
-            const updatedSprites = sprites.map(s => {
-                s.update();
-                return s;
-            });
+            sprites.forEach(s => { s.update() });
 
             // Colliding bullets & enemies
-            const bullets = updatedSprites.filter(s => s.type === 'bullet');
-            const enemies = updatedSprites.filter(s => s.type === 'enemy');
+            const bullets = findBullets(sprites);
+            const enemies = findEnemies(sprites);
+            const player = findPlayer(sprites);
 
             if (enemies.length) {
                 findAllColliding(bullets, enemies).forEach(s => {
                     s.ttl = 0;
                 });
             } else {
-                sprites.push(...(spawnEnemies(waveSize++)));
+                // sprites.push(...spawnEnemies({ number: waveSize++ , player }));
                 console.log('NEW WAVE', waveSize);
             }
 
             // Player being hit
-            const player = updatedSprites.find(s => s.type === 'player');
-            const collidingEnemy = findColliding(player, enemies);
+            if (player) {
+                const collidingEnemies = findMultiColliding(player, enemies);
 
-            if (player && collidingEnemy) {
-                collidingEnemy.dx = 0;
-                collidingEnemy.dy = 0;
-                if (collidingEnemy.lastHit > 1) {
-                    collidingEnemy.lastHit = 0;
-                    player.hp -= collidingEnemy.damage;
-                    console.log('HP:', player.hp);
+                if (collidingEnemies) {
+                    collidingEnemies.forEach(enemy => {
+                        stopSprite(enemy);
+                        if (enemy.lastHit > 1) {
+                            enemy.lastHit = 0;
+                            player.hp -= enemy.damage;
+                            console.log('HP:', player.hp);
 
-                    if (player.hp <=0) {
-                        console.log('GAME OVER');
-                        player.ttl = 0;
-                    }
-                } else {
-                    collidingEnemy.lastHit += 1/60;
+                            if (player.hp <= 0) {
+                                emit(ACTIONS.GAME_OVER);
+                            }
+                        } else {
+                            enemy.lastHit += 1 / 60;
+                        }
+                    })
                 }
             }
 
             // Remove unused sprites
-            sprites = updatedSprites.filter(s => s.isAlive());
+            sprites = sprites.filter(s => s.isAlive());
 
             console.debug('SPRITES', sprites.length, 'ENEMIES', enemies.filter(e => e.ttl).length);
         },
         render() {
-            sprites.forEach(s => {
-                s.render();
-            });
+            sprites.forEach(s => { s.render() })
         }
-    }).start();
+    }).start()
 })();

@@ -1,20 +1,17 @@
 import { Sprite } from './node_modules/kontra/kontra.mjs';
-import { degreesToRadians } from './helpers.js';
+import { SPRITES } from './const.js';
 
-export default player => {
-    const cos = Math.cos(player.rotation);
-    const sin = Math.sin(player.rotation);
+export const Bullet = ({ position, velocity }) => Sprite({
+    type: SPRITES.BULLET,
+    x: position.x,
+    y: position.y,
+    dx: velocity.x,
+    dy: velocity.y,
+    ttl: 50,
+    width: 2,
+    height: 2,
+    color: 'red',
+    damage: 10
+});
 
-    return Sprite({
-        type: 'bullet',
-        x: player.x + cos * 12,
-        y: player.y + sin * 12,
-        dx: cos * 5,
-        dy: sin * 5,
-        ttl: 50,
-        width: 2,
-        height: 2,
-        color: 'red',
-        damage: 10
-    });
-}
+export const findBullets = sprites => sprites.filter(s => s.type === SPRITES.BULLET);

@@ -1,5 +1,5 @@
 import { Sprite } from './node_modules/kontra/kontra.mjs';
-import { degreesToRadians } from './helpers.js';
+import { SPRITES, WEAPONS } from './const.js';
 
 export const Player = ({ id, x, y, pointer }) => new Promise((resolve, reject) => {
     const image = new Image();
@@ -7,14 +7,14 @@ export const Player = ({ id, x, y, pointer }) => new Promise((resolve, reject) =
     image.onload = () => {
         resolve(Sprite({
             id,
-            type: 'player',
+            type: SPRITES.PLAYER,
             x,
             y,
             radius: 8,
             rotation: 0,
             anchor: { x: 0.5, y: 0.5 },
             image,
-            weapon: 'Gun',
+            weapon: WEAPONS.GUN,
             hp: 20,
             update() {
                 this.rotation = Math.atan2(pointer.y - this.y, pointer.x - this.x);
@@ -38,3 +38,5 @@ export const Base = ({ id, x, y }) => new Promise((resolve, reject) => {
         }))
     }
 });
+
+export const findPlayer = sprites => sprites.find(s => s.type === SPRITES.PLAYER);
