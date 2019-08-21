@@ -8,7 +8,7 @@ module.exports = {
     },
     devtool: 'source-map',
     devServer: {
-        contentBase: './dist',
+        contentBase: '.',
         liveReload: true,
         open: true,
         port: 9000,

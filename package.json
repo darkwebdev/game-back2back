@@ -5,12 +5,18 @@
   "author": "gtibalt@gmail.com",
   "license": "MIT",
   "scripts": {
-    "start:dev": "webpack-dev-server"
+    "start:dev": "webpack-dev-server",
+    "build": "yarn webpack --config=webpack.prod.config.js",
+    "img": "cp -R assets release && bin/ect -9 -strip --allfilters-b -quiet release/assets/*.png",
+    "zip": "rm -f release/game.zip && zip -9 -r release/game.zip release/main.min.js release/index.html release/assets && bin/ect -9 -zip release/game.zip",
+    "release": "yarn build && yarn img && yarn zip"
   },
   "dependencies": {
     "kontra": "^6.2.3"
   },
   "devDependencies": {
+    "optimize-css-assets-webpack-plugin": "^5.0.3",
+    "terser-webpack-plugin": "^1.4.1",
     "webpack": "^4.39.2",
     "webpack-cli": "^3.3.7",
     "webpack-dev-server": "^3.8.0"
