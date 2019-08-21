@@ -1,4 +1,4 @@
-import { Sprite } from './node_modules/kontra/kontra.mjs';
+import { Sprite } from 'kontra';
 import { SPRITES, WEAPONS } from './const.js';
 
 export const Player = ({ id, x, y, pointer }) => new Promise((resolve, reject) => {
@@ -39,4 +39,4 @@ export const Base = ({ id, x, y }) => new Promise((resolve, reject) => {
     }
 });
 
-export const findPlayer = sprites => sprites.find(s => s.type === SPRITES.PLAYER);
+export const findPlayer = sprites => sprites.ofType(SPRITES.PLAYER)[0];

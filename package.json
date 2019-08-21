@@ -4,7 +4,15 @@
   "main": "index.js",
   "author": "gtibalt@gmail.com",
   "license": "MIT",
+  "scripts": {
+    "start:dev": "webpack-dev-server"
+  },
   "dependencies": {
     "kontra": "^6.2.3"
+  },
+  "devDependencies": {
+    "webpack": "^4.39.2",
+    "webpack-cli": "^3.3.7",
+    "webpack-dev-server": "^3.8.0"
   }
 }

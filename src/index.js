@@ -2,13 +2,14 @@ import {
     GameLoop, init,
     emit,
     initPointer, onPointerDown, pointer
-} from './node_modules/kontra/kontra.mjs';
+} from 'kontra';
 import { Player, Base, findPlayer } from './player.js';
-import { findAllColliding, findMultiColliding, stopSprite } from './helpers.js';
+import { dealDamage, findMultiColliding, stopSprite } from './helpers.js';
 import { findEnemies, spawnEnemies } from './enemy.js';
-import initReducer from './reducer.js';
+import initEvents from './events.js';
 import { findBullets } from './bullet.js';
 import { ACTIONS } from './const.js'
+import sprites from './sprites.js';
 
 (async () => {
     console.log('Initializing game engine...');
@@ -16,10 +17,9 @@ import { ACTIONS } from './const.js'
     const { canvas } = init();
     initPointer();
 
-    let sprites = [];
     let waveSize = 5;
 
-    initReducer(sprites);
+    initEvents();
 
     // Player
 
@@ -28,7 +28,7 @@ import { ACTIONS } from './const.js'
         x: canvas.width / 2,
         y: canvas.height / 2
     });
-    sprites.push(base);
+    sprites.add(base);
 
     const player = await Player({
         id: 'player-1',
@@ -36,29 +36,34 @@ import { ACTIONS } from './const.js'
         y: canvas.height / 2,
         pointer
     });
-    sprites.push(player);
-    sprites.push(...spawnEnemies({ number: waveSize, player }));
+    sprites.add(player);
+    emit(ACTIONS.NEW_WAVE, waveSize++, player);
 
     onPointerDown((e, object) => {
         emit(ACTIONS.FIRE);
     });
 
-    GameLoop({
+    const loop = GameLoop({
         update() {
-            sprites.forEach(s => { s.update() });
+            sprites.update();
 
             // Colliding bullets & enemies
             const bullets = findBullets(sprites);
             const enemies = findEnemies(sprites);
             const player = findPlayer(sprites);
 
-            if (enemies.length) {
-                findAllColliding(bullets, enemies).forEach(s => {
-                    s.ttl = 0;
-                });
-            } else {
-                // sprites.push(...spawnEnemies({ number: waveSize++ , player }));
-                console.log('NEW WAVE', waveSize);
+            if (enemies.length && bullets.length) {
+                bullets.forEach(bullet => {
+                    const enemiesHit = findMultiColliding(bullet, enemies);
+                    enemiesHit.forEach(enemy => {
+                        emit(ACTIONS.HIT_ENEMY, enemy, bullet.damage);
+                        emit(ACTIONS.REMOVE_BULLET, bullet)
+                    })
+                })
+            }
+
+            if (!enemies.filter(e => !e.nonColliding).length) {
+                emit(ACTIONS.NEW_WAVE, waveSize++, player)
             }
 
             // Player being hit
@@ -68,28 +73,23 @@ import { ACTIONS } from './const.js'
                 if (collidingEnemies) {
                     collidingEnemies.forEach(enemy => {
                         stopSprite(enemy);
-                        if (enemy.lastHit > 1) {
-                            enemy.lastHit = 0;
-                            player.hp -= enemy.damage;
-                            console.log('HP:', player.hp);
-
-                            if (player.hp <= 0) {
-                                emit(ACTIONS.GAME_OVER);
-                            }
-                        } else {
-                            enemy.lastHit += 1 / 60;
+                        dealDamage(enemy, player);
+                        if (player.hp <= 0) {
+                            emit(ACTIONS.GAME_OVER);
+                            loop.stop()
                         }
                     })
                 }
             }
 
-            // Remove unused sprites
-            sprites = sprites.filter(s => s.isAlive());
+            sprites.dropUnused();
 
-            console.debug('SPRITES', sprites.length, 'ENEMIES', enemies.filter(e => e.ttl).length);
+            console.debug('SPRITES', sprites.toString(), 'ENEMIES', enemies.filter(e => e.ttl).length);
         },
         render() {
-            sprites.forEach(s => { s.render() })
+            sprites.render()
         }
-    }).start()
+    });
+
+    loop.start()
 })();
