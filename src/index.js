@@ -16,19 +16,17 @@ import sprites from './sprites.js';
 
     const { canvas } = init();
     initPointer();
+    initEvents();
 
     let waveSize = 5;
 
-    initEvents();
-
     // Player
 
-    const base = await Base({
+    emit(ACTIONS.ADD_SPRITES, await Base({
         id: 'base-1',
         x: canvas.width / 2,
         y: canvas.height / 2
-    });
-    sprites.add(base);
+    }));
 
     const player = await Player({
         id: 'player-1',
@@ -36,7 +34,7 @@ import sprites from './sprites.js';
         y: canvas.height / 2,
         pointer
     });
-    sprites.add(player);
+    emit(ACTIONS.ADD_SPRITES, player);
     emit(ACTIONS.NEW_WAVE, waveSize++, player);
 
     onPointerDown((e, object) => {
@@ -47,7 +45,7 @@ import sprites from './sprites.js';
         update() {
             sprites.update();
 
-            // Colliding bullets & enemies
+            // Colliding bullets & enemies & player
             const bullets = findBullets(sprites);
             const enemies = findEnemies(sprites);
             const player = findPlayer(sprites);
@@ -62,24 +60,21 @@ import sprites from './sprites.js';
                 })
             }
 
-            if (!enemies.filter(e => !e.nonColliding).length) {
-                emit(ACTIONS.NEW_WAVE, waveSize++, player)
-            }
-
             // Player being hit
             if (player) {
                 const collidingEnemies = findMultiColliding(player, enemies);
 
                 if (collidingEnemies) {
                     collidingEnemies.forEach(enemy => {
-                        stopSprite(enemy);
-                        dealDamage(enemy, player);
-                        if (player.hp <= 0) {
-                            emit(ACTIONS.GAME_OVER);
-                            loop.stop()
-                        }
+                        emit(ACTIONS.STOP_ENEMY, enemy);
+                        emit(ACTIONS.HIT_PLAYER, enemy)
                     })
                 }
+            }
+
+            // No more enemies?
+            if (!enemies.filter(e => !e.nonColliding).length) {
+                emit(ACTIONS.NEW_WAVE, waveSize++, player)
             }
 
             sprites.dropUnused();

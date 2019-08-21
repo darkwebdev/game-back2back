@@ -47,4 +47,4 @@ export const dealDamage = (dealer, receiver) => {
     } else {
         dealer.lastHit += 1 / 60;
     }
-}
+};
