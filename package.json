@@ -7,7 +7,7 @@
   "scripts": {
     "start:dev": "webpack-dev-server",
     "build": "yarn webpack --config=webpack.prod.config.js",
-    "img": "cp -R assets release && bin/ect -9 -strip --allfilters-b -quiet release/assets/*.png",
+    "img": "cp -R assets/*.png release/assets/ && bin/ect -9 -strip --allfilters-b -quiet release/assets/*.png",
     "zip": "rm -f release/game.zip && zip -9 -r release/game.zip release/main.min.js release/index.html release/assets && bin/ect -9 -zip release/game.zip",
     "release": "yarn build && yarn img && yarn zip"
   },

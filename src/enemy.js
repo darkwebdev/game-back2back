@@ -1,6 +1,6 @@
-import { emit, Sprite, Vector } from 'kontra';
-import { range, normalized, stopSprite } from './helpers.js';
-import { ACTIONS, SPRITES } from './const.js';
+import { emit, Sprite } from 'kontra';
+import { range, normalized, stopSprite } from './helpers'
+import { ACTIONS, SPRITES } from './const'
 
 export const Enemy = ({ id, targetPosition }) => {
     const x = Math.random() * 100;

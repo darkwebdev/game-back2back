@@ -1,10 +1,10 @@
 import { on, emit, Vector } from 'kontra';
-import { Bullet, removeBullet } from './bullet.js';
-import { findPlayer } from './player.js';
-import { ACTIONS } from './const.js';
-import { dealDamage, stopSprite } from './helpers.js';
-import { findEnemies, hitEnemy, killEnemy, spawnEnemies } from './enemy.js';
-import sprites from './sprites.js';
+import { Bullet, removeBullet } from './bullet'
+import { findPlayer } from './player'
+import { ACTIONS } from './const'
+import { dealDamage, stopSprite } from './helpers'
+import { findEnemies, hitEnemy, killEnemy, spawnEnemies } from './enemy'
+import sprites from './sprites'
 
 export default () => {
     on(ACTIONS.ADD_SPRITES, sprites.add);
@@ -52,5 +52,6 @@ export default () => {
         const enemies = findEnemies(sprites);
         enemies.forEach(stopSprite);
         player.ttl = 0;
+        console.log('==== GAME OVER! ====')
     })
 }

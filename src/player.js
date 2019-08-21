@@ -1,9 +1,10 @@
 import { Sprite } from 'kontra';
-import { SPRITES, WEAPONS } from './const.js';
+import { SPRITES, WEAPONS } from './const'
+import { dpr } from './canvas';
 
 export const Player = ({ id, x, y, pointer }) => new Promise((resolve, reject) => {
     const image = new Image();
-    image.src = 'assets/gun.png';
+    image.src = 'assets/gun-32.png';
     image.onload = () => {
         resolve(Sprite({
             id,
@@ -17,7 +18,7 @@ export const Player = ({ id, x, y, pointer }) => new Promise((resolve, reject) =
             weapon: WEAPONS.GUN,
             hp: 20,
             update() {
-                this.rotation = Math.atan2(pointer.y - this.y, pointer.x - this.x);
+                this.rotation = Math.atan2(pointer.y/dpr - this.y, pointer.x/dpr - this.x);
             }
         }))
     }
@@ -25,7 +26,7 @@ export const Player = ({ id, x, y, pointer }) => new Promise((resolve, reject) =
 
 export const Base = ({ id, x, y }) => new Promise((resolve, reject) => {
     const image = new Image();
-    image.src = 'assets/base.png';
+    image.src = 'assets/base-32.png';
     image.onload = () => {
         resolve(Sprite({
             id,

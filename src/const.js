@@ -5,7 +5,8 @@ export const SPRITES = {
 };
 
 export const WEAPONS = {
-    GUN: 'gun'
+    GUN: 'gun',
+    LASER: 'laser'
 };
 
 export const ACTIONS = {

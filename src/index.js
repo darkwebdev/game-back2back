@@ -1,20 +1,16 @@
-import {
-    GameLoop, init,
-    emit,
-    initPointer, onPointerDown, pointer
-} from 'kontra';
-import { Player, Base, findPlayer } from './player.js';
-import { dealDamage, findMultiColliding, stopSprite } from './helpers.js';
-import { findEnemies, spawnEnemies } from './enemy.js';
-import initEvents from './events.js';
-import { findBullets } from './bullet.js';
-import { ACTIONS } from './const.js'
-import sprites from './sprites.js';
+import { GameLoop, emit, initPointer, onPointerDown, pointer } from 'kontra';
+import { Player, Base, findPlayer } from './player'
+import { findMultiColliding } from './helpers'
+import { findEnemies } from './enemy'
+import initEvents from './events'
+import { findBullets } from './bullet'
+import { ACTIONS } from './const'
+import sprites from './sprites'
+import { canvas, dpr } from './canvas'
 
 (async () => {
     console.log('Initializing game engine...');
 
-    const { canvas } = init();
     initPointer();
     initEvents();
 
@@ -24,14 +20,14 @@ import sprites from './sprites.js';
 
     emit(ACTIONS.ADD_SPRITES, await Base({
         id: 'base-1',
-        x: canvas.width / 2,
-        y: canvas.height / 2
+        x: canvas.width / 2 / dpr,
+        y: canvas.height / 2 / dpr
     }));
 
     const player = await Player({
         id: 'player-1',
-        x: canvas.width / 2,
-        y: canvas.height / 2,
+        x: canvas.width / 2 / dpr,
+        y: canvas.height / 2 / dpr,
         pointer
     });
     emit(ACTIONS.ADD_SPRITES, player);

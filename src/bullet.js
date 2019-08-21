@@ -1,5 +1,5 @@
 import { Sprite } from 'kontra';
-import { SPRITES } from './const.js';
+import { SPRITES } from './const'
 
 export const Bullet = ({ position, velocity }) =>
     Sprite({
