@@ -1,16 +1,16 @@
-import { on, emit, Vector } from 'kontra';
-import { Bullet, removeBullet } from './bullet'
-import { findPlayer } from './player'
-import { ACTIONS } from './const'
-import { dealDamage, stopSprite } from './helpers'
-import { findEnemies, hitEnemy, killEnemy, spawnEnemies } from './enemy'
-import sprites from './sprites'
+import { emit, on, Vector } from 'kontra';
+import { Bullet, removeBullet } from './bullet';
+import { findPlayer } from './player';
+import { ACTIONS, STEPS } from './const';
+import { dealDamage, stopSprite } from './helpers';
+import { hitEnemy, killEnemy, spawnEnemies } from './enemy';
+import state from './state';
 
 export default () => {
-    on(ACTIONS.ADD_SPRITES, sprites.add);
+    on(ACTIONS.ADD_SPRITES, state.sprites.add);
 
     on(ACTIONS.FIRE, () => {
-        const player = findPlayer(sprites);
+        const player = findPlayer(state.sprites);
         if (!player) return;
 
         console.log('POP!');
@@ -32,28 +32,56 @@ export default () => {
     on(ACTIONS.STOP_ENEMY, stopSprite);
 
     on(ACTIONS.HIT_PLAYER, dealer => {
-        const player = findPlayer(sprites);
+        const player = findPlayer(state.sprites);
 
         dealDamage(dealer, player);
         if (player.hp <= 0) {
-            emit(ACTIONS.GAME_OVER);
+            emit(ACTIONS.SET_STEP, STEPS.GAME_OVER);
+        }
+    });
+
+    on(ACTIONS.CLEAN_WORLD, () => {
+        // emit(ACTIONS.UPDATE_STATE, )
+        state.sprites.dropUnused();
+    });
+
+    on(ACTIONS.UPDATE_STATE, newState => {
+        // state = { ...state, ...newState }
+    });
+
+    on(ACTIONS.SET_STEP, step => {
+        console.log('NEW STEP:', step);
+        switch(step) {
+            case STEPS.WAVE: {
+                const player = findPlayer(state.sprites);
+                const waveSize = state.waveSize + 1;
+
+                emit(ACTIONS.NEW_WAVE, waveSize, player);
+                state.current = STEPS.WAVE;
+                state.waveSize = waveSize;
+
+                break
+            }
+            case STEPS.REST: {
+                state.current = STEPS.REST;
+                state.timeTillWave = 2000;
+
+                break
+            }
+            case STEPS.GAME_OVER: {
+                console.log('==== GAME OVER! ====')
+                const player = findPlayer(state.sprites);
+                player.ttl = 0; //todo: change sprite to dead
+                break
+            }
         }
     });
 
     on(ACTIONS.NEW_WAVE, async (waveSize, target) => {
-        console.log('NEW WAVE', waveSize);
-        const enemies = await Promise.all(spawnEnemies({
+        console.log('NEW WAVE...', waveSize);
+        emit(ACTIONS.ADD_SPRITES, await Promise.all(spawnEnemies({
             number: waveSize,
             targetPosition: Vector(target.x, target.y)
-        }));
-        emit(ACTIONS.ADD_SPRITES, enemies)
+        })))
     });
-
-    on(ACTIONS.GAME_OVER, () => {
-        const player = findPlayer(sprites);
-        const enemies = findEnemies(sprites);
-        enemies.forEach(stopSprite);
-        player.ttl = 0;
-        console.log('==== GAME OVER! ====')
-    })
 }

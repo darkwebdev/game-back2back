@@ -1,8 +1,6 @@
-import { emit, Sprite, load, imageAssets } from 'kontra';
-import { range, normalized, stopSprite } from './helpers'
-import { ACTIONS, SPRITES } from './const'
-
-const images = load('assets/enemy.png', 'assets/enemy-dead.png');
+import { emit, loadImage, Sprite, SpriteSheet } from 'kontra';
+import { normalized, range, stopSprite } from './helpers';
+import { ACTIONS, SPRITES } from './const';
 
 export const Enemy = async ({ id, targetPosition }) => {
     const x = Math.random() * 100;
@@ -12,7 +10,21 @@ export const Enemy = async ({ id, targetPosition }) => {
     const distance = normalized(dx, dy);
     const speed = 0.1;
 
-    const [enemyImg] = await images;
+    const spriteSheet = SpriteSheet({
+        image: await loadImage('assets/enemy.png'),
+        frameWidth: 90,
+        frameHeight: 100,
+        animations: {
+            walk: {
+                frames: '0..5',
+                frameRate: 10
+            },
+            die: {
+                frames: [7],
+                frameRate: 1
+            }
+        }
+    });
 
     return Sprite({
         id,
@@ -25,8 +37,7 @@ export const Enemy = async ({ id, targetPosition }) => {
         radius: 10,
         width: 32,
         height: 32,
-        anchor: { x: 0.5, y: 0.5 },
-        image: enemyImg,
+        animations: spriteSheet.animations,
         damage: 1,
         hp: 10,
         lastHit: 0,
@@ -44,7 +55,7 @@ export const spawnEnemies = ({ number, targetPosition }) =>
 export const findEnemies = sprites => sprites.ofType(SPRITES.ENEMY);
 
 export const killEnemy = enemy => {
-    enemy.image = imageAssets['assets/enemy-dead'];
+    enemy.playAnimation('die');
     enemy.nonColliding = true;
     stopSprite(enemy);
 };

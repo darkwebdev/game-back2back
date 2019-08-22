@@ -9,6 +9,12 @@ export const WEAPONS = {
     LASER: 'laser'
 };
 
+export const STEPS = {
+    WAVE: 'wave',
+    REST: 'rest',
+    GAME_OVER: 'game-over'
+};
+
 export const ACTIONS = {
     ADD_SPRITES: 'add-sprites',
 
@@ -19,6 +25,10 @@ export const ACTIONS = {
     REMOVE_BULLET: 'remove-bullet',
     HIT_PLAYER: 'hit-player',
 
+    UPDATE_STATE: 'update-state',
+    SET_STEP: 'set-state',
+
+    CLEAN_WORLD: 'clean-world',
     NEW_WAVE: 'new-wave',
     NEW_BASE: 'new-base',
     GAME_OVER: 'game-over'
