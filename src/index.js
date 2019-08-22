@@ -1,6 +1,6 @@
 import { GameLoop, emit, initPointer, onPointerDown, pointer } from 'kontra';
 import { Player, Base, findPlayer } from './player'
-import { findMultiColliding } from './helpers'
+import { findAllColliding, findColliding } from './helpers';
 import { findEnemies } from './enemy'
 import initEvents from './events'
 import { findBullets } from './bullet'
@@ -14,21 +14,23 @@ import { canvas, dpr } from './canvas'
     initPointer();
     initEvents();
 
-    let waveSize = 5;
+    let waveSize = 1;
 
     // Player
 
-    emit(ACTIONS.ADD_SPRITES, await Base({
+    const base = await Base({
         id: 'base-1',
         x: canvas.width / 2 / dpr,
         y: canvas.height / 2 / dpr
-    }));
+    });
+    emit(ACTIONS.ADD_SPRITES, base);
 
     const player = await Player({
         id: 'player-1',
         x: canvas.width / 2 / dpr,
         y: canvas.height / 2 / dpr,
-        pointer
+        pointer,
+        base
     });
     emit(ACTIONS.ADD_SPRITES, player);
     emit(ACTIONS.NEW_WAVE, waveSize++, player);
@@ -48,24 +50,23 @@ import { canvas, dpr } from './canvas'
 
             if (enemies.length && bullets.length) {
                 bullets.forEach(bullet => {
-                    const enemiesHit = findMultiColliding(bullet, enemies);
-                    enemiesHit.forEach(enemy => {
+                    const enemy = findColliding(bullet, enemies);
+
+                    if (enemy) {
                         emit(ACTIONS.HIT_ENEMY, enemy, bullet.damage);
                         emit(ACTIONS.REMOVE_BULLET, bullet)
-                    })
+                    }
                 })
             }
 
             // Player being hit
             if (player) {
-                const collidingEnemies = findMultiColliding(player, enemies);
+                const collidingEnemies = findAllColliding(player.base, enemies);
 
-                if (collidingEnemies) {
-                    collidingEnemies.forEach(enemy => {
-                        emit(ACTIONS.STOP_ENEMY, enemy);
-                        emit(ACTIONS.HIT_PLAYER, enemy)
-                    })
-                }
+                collidingEnemies.forEach(enemy => {
+                    emit(ACTIONS.STOP_ENEMY, enemy);
+                    emit(ACTIONS.HIT_PLAYER, enemy)
+                })
             }
 
             // No more enemies?

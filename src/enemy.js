@@ -1,14 +1,18 @@
-import { emit, Sprite } from 'kontra';
+import { emit, Sprite, load, imageAssets } from 'kontra';
 import { range, normalized, stopSprite } from './helpers'
 import { ACTIONS, SPRITES } from './const'
 
-export const Enemy = ({ id, targetPosition }) => {
+const images = load('assets/enemy.png', 'assets/enemy-dead.png');
+
+export const Enemy = async ({ id, targetPosition }) => {
     const x = Math.random() * 100;
     const y = Math.random() * 100;
     const dx = targetPosition.x - x;
     const dy = targetPosition.y - y;
     const distance = normalized(dx, dy);
     const speed = 0.1;
+
+    const [enemyImg] = await images;
 
     return Sprite({
         id,
@@ -17,21 +21,17 @@ export const Enemy = ({ id, targetPosition }) => {
         y,
         dx: dx / distance * speed,
         dy: dy / distance * speed,
-        rotation: 0,
         speed,
         radius: 10,
+        width: 32,
+        height: 32,
+        anchor: { x: 0.5, y: 0.5 },
+        image: enemyImg,
         damage: 1,
         hp: 10,
         lastHit: 0,
-        color: 'red',
-        nonColliding: false,
-        render() {
-            this.context.strokeStyle = this.color;
-            this.context.beginPath();
-            this.context.arc(this.x, this.y, this.radius, 0, Math.PI*2);
-            this.context.stroke();
-        }
-    });
+        nonColliding: false
+    })
 };
 
 export const spawnEnemies = ({ number, targetPosition }) =>
@@ -44,9 +44,9 @@ export const spawnEnemies = ({ number, targetPosition }) =>
 export const findEnemies = sprites => sprites.ofType(SPRITES.ENEMY);
 
 export const killEnemy = enemy => {
-    enemy.color = 'black';
+    enemy.image = imageAssets['assets/enemy-dead'];
+    enemy.nonColliding = true;
     stopSprite(enemy);
-    enemy.nonColliding = true
 };
 
 export const hitEnemy = (enemy, damage) => {

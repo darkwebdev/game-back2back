@@ -2,7 +2,7 @@ import { Sprite } from 'kontra';
 import { SPRITES, WEAPONS } from './const'
 import { dpr } from './canvas';
 
-export const Player = ({ id, x, y, pointer }) => new Promise((resolve, reject) => {
+export const Player = ({ id, x, y, pointer, base }) => new Promise((resolve, reject) => {
     const image = new Image();
     image.src = 'assets/gun-32.png';
     image.onload = () => {
@@ -17,6 +17,7 @@ export const Player = ({ id, x, y, pointer }) => new Promise((resolve, reject) =
             image,
             weapon: WEAPONS.GUN,
             hp: 20,
+            base,
             update() {
                 this.rotation = Math.atan2(pointer.y/dpr - this.y, pointer.x/dpr - this.x);
             }

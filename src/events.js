@@ -10,9 +10,10 @@ export default () => {
     on(ACTIONS.ADD_SPRITES, sprites.add);
 
     on(ACTIONS.FIRE, () => {
-        console.log('POP!');
-
         const player = findPlayer(sprites);
+        if (!player) return;
+
+        console.log('POP!');
         const cos = Math.cos(player.rotation);
         const sin = Math.sin(player.rotation);
         const x = player.x + cos * 12;
@@ -39,12 +40,13 @@ export default () => {
         }
     });
 
-    on(ACTIONS.NEW_WAVE, (waveSize, target) => {
+    on(ACTIONS.NEW_WAVE, async (waveSize, target) => {
         console.log('NEW WAVE', waveSize);
-        emit(ACTIONS.ADD_SPRITES, spawnEnemies({
+        const enemies = await Promise.all(spawnEnemies({
             number: waveSize,
             targetPosition: Vector(target.x, target.y)
-        }))
+        }));
+        emit(ACTIONS.ADD_SPRITES, enemies)
     });
 
     on(ACTIONS.GAME_OVER, () => {
