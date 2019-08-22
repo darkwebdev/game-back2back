@@ -39,7 +39,7 @@ import { canvas, dpr } from './canvas'
 
     const loop = GameLoop({
         update() {
-            if (state.current === STEPS.GAME_OVER) return;
+            if (state.step === STEPS.GAME_OVER) return;
 
             state.sprites.update();
 
@@ -68,11 +68,11 @@ import { canvas, dpr } from './canvas'
             });
 
             // No more enemies?
-            if (!enemies.filter(e => !e.nonColliding).length && state.current === STEPS.WAVE) {
+            if (!enemies.filter(e => !e.nonColliding).length && state.step === STEPS.WAVE) {
                 emit(ACTIONS.SET_STEP, STEPS.REST)
             }
 
-            if (state.current === STEPS.REST) {
+            if (state.step === STEPS.REST) {
                 if (state.timeTillWave) {
                     state.timeTillWave -= 10;
                 } else {

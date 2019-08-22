@@ -51,19 +51,18 @@ export default () => {
 
     on(ACTIONS.SET_STEP, step => {
         console.log('NEW STEP:', step);
+        state.step = step;
         switch(step) {
             case STEPS.WAVE: {
                 const player = findPlayer(state.sprites);
                 const waveSize = state.waveSize + 1;
 
                 emit(ACTIONS.NEW_WAVE, waveSize, player);
-                state.current = STEPS.WAVE;
                 state.waveSize = waveSize;
 
                 break
             }
             case STEPS.REST: {
-                state.current = STEPS.REST;
                 state.timeTillWave = 2000;
 
                 break
