@@ -16,12 +16,13 @@ export const Enemy = async ({ id, targetPosition }) => {
         frameHeight: 100,
         animations: {
             walk: {
-                frames: '0..5',
+                frames: '0..3',
                 frameRate: 10
             },
             die: {
-                frames: [7],
-                frameRate: 1
+                frames: [0],
+                frameRate: 1,
+                loop: false
             }
         }
     });
@@ -41,7 +42,17 @@ export const Enemy = async ({ id, targetPosition }) => {
         damage: 1,
         hp: 10,
         lastHit: 0,
-        nonColliding: false
+        nonColliding: false,
+        render() {
+            if (this.hp <= 0) {
+                this.context.save();
+                this.context.globalAlpha = 0.5;
+                this.draw();
+                this.context.restore();
+            } else {
+                this.draw();
+            }
+        }
     })
 };
 
@@ -55,6 +66,8 @@ export const spawnEnemies = ({ number, targetPosition }) =>
 export const findEnemies = sprites => sprites.ofType(SPRITES.ENEMY);
 
 export const killEnemy = enemy => {
+    enemy.width *= 0.8;
+    enemy.height *= 0.8;
     enemy.playAnimation('die');
     enemy.nonColliding = true;
     stopSprite(enemy);
