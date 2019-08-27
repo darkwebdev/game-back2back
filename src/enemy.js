@@ -2,13 +2,15 @@ import { emit, loadImage, Sprite, SpriteSheet } from 'kontra';
 import { normalized, range, stopSprite } from './helpers';
 import { ACTIONS, SPRITES } from './const';
 
-export const Enemy = async ({ id, targetPosition }) => {
-    const x = Math.random() * 100;
-    const y = Math.random() * 100;
+export const Enemy = async ({ id, spawnRadius, targetPosition }) => {
+    const angle = Math.random() * Math.PI*2;
+    const x = Math.cos(angle) * spawnRadius + spawnRadius - 16;
+    const y = Math.sin(angle) * spawnRadius + spawnRadius - 16;
+    // console.log('radius', spawnRadius, 'x', x, 'y', y)
     const dx = targetPosition.x - x;
     const dy = targetPosition.y - y;
     const distance = normalized(dx, dy);
-    const speed = 0.1;
+    const speed = 0.2;
 
     const spriteSheet = SpriteSheet({
         image: await loadImage('assets/enemy.png'),
@@ -56,11 +58,11 @@ export const Enemy = async ({ id, targetPosition }) => {
     })
 };
 
-export const spawnEnemies = ({ number, targetPosition }) =>
+export const spawnEnemies = ({ number, spawnRadius, targetPosition }) =>
     range(number).map(n => {
         const id = `enemy-${n}`;
         console.log(`Creating new enemy ${id}...`);
-        return Enemy({ id, targetPosition });
+        return Enemy({ id, spawnRadius, targetPosition });
     });
 
 export const findEnemies = sprites => sprites.ofType(SPRITES.ENEMY);

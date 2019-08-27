@@ -5,6 +5,7 @@ import { ACTIONS, STEPS } from './const';
 import { dealDamage, stopSprite } from './helpers';
 import { hitEnemy, killEnemy, spawnEnemies } from './enemy';
 import state from './state';
+import { canvas, dpr } from './canvas'
 
 export default () => {
     on(ACTIONS.ADD_SPRITES, state.sprites.add);
@@ -56,8 +57,9 @@ export default () => {
             case STEPS.WAVE: {
                 const player = findPlayer(state.sprites);
                 const waveSize = state.waveSize + 1;
+                const spawnRadius = Math.min(canvas.width, canvas.height) / 2 / dpr;
 
-                emit(ACTIONS.NEW_WAVE, waveSize, player);
+                emit(ACTIONS.NEW_WAVE, waveSize, spawnRadius, player);
                 state.waveSize = waveSize;
 
                 break
@@ -76,10 +78,11 @@ export default () => {
         }
     });
 
-    on(ACTIONS.NEW_WAVE, async (waveSize, target) => {
+    on(ACTIONS.NEW_WAVE, async (waveSize, spawnRadius, target) => {
         console.log('NEW WAVE...', waveSize);
         emit(ACTIONS.ADD_SPRITES, await Promise.all(spawnEnemies({
             number: waveSize,
+            spawnRadius,
             targetPosition: Vector(target.x, target.y)
         })))
     });
