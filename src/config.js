@@ -6,6 +6,14 @@ export const waves = {
     multiplier: 2
 };
 
+export const enemies = {
+    radius: 14,
+    damage: 1,
+    hp: 10,
+    speed: 0.1,
+    image: 'assets/enemy.png'
+};
+
 export const weapons = {
     default: WEAPONS.LASER,
     [WEAPONS.GUN]: {

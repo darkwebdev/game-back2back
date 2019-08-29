@@ -122,6 +122,12 @@ import { weapons } from './config';
     bindKeys('w', () => {
         emit(ACTIONS.SET_STEP, STEPS.WAVE)
     });
+    bindKeys('m', () => {
+        findEnemies(state.sprites).forEach(e => {
+            e.speed += 0.1
+            console.log('SPEED', e.speed)
+        })
+    });
 
     // Go-go-go!!
     loop.start()

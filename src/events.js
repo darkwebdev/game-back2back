@@ -4,7 +4,7 @@ import {  Laser } from './laser';
 import { findPlayer } from './player';
 import { ACTIONS, STEPS, WEAPONS } from './const';
 import { dealDamage, stopSprite } from './helpers';
-import { hitEnemy, killEnemy, spawnEnemies } from './enemy';
+import { findEnemies, hitEnemy, killEnemy, spawnEnemies } from './enemy';
 import state from './state';
 import { canvas, dpr } from './canvas';
 
@@ -18,9 +18,9 @@ export default () => {
         const player = findPlayer(state.sprites);
         if (!player) return;
 
-        console.log('POP!');
         switch(player.weapon) {
             case WEAPONS.GUN:
+                console.log('POP!');
                 emit(ACTIONS.ADD_SPRITES, Bullet({ owner: player }));
                 break;
 
@@ -28,7 +28,8 @@ export default () => {
                 console.log('zzzzzz!')
                 emit(ACTIONS.ADD_SPRITES, Laser({
                     owner: player,
-                    rayLength: canvasMaxRadius
+                    rayLength: canvasMaxRadius,
+                    enemies: findEnemies(state.sprites)
                 }));
                 break;
             }

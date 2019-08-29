@@ -1,6 +1,7 @@
 import { emit, loadImage, Sprite, SpriteSheet } from 'kontra';
 import { normalized, range, stopSprite } from './helpers';
 import { ACTIONS, SPRITES } from './const';
+import { enemies } from './config';
 
 export const Enemy = async ({ id, spawnRadius, targetPosition }) => {
     const angle = Math.random() * Math.PI*2;
@@ -10,10 +11,10 @@ export const Enemy = async ({ id, spawnRadius, targetPosition }) => {
     const dx = targetPosition.x - x;
     const dy = targetPosition.y - y;
     const distance = normalized(dx, dy);
-    const speed = 0.2;
+    const { radius, damage, hp, speed, image } = enemies;
 
     const spriteSheet = SpriteSheet({
-        image: await loadImage('assets/enemy.png'),
+        image: await loadImage(image),
         frameWidth: 90,
         frameHeight: 100,
         animations: {
@@ -29,20 +30,18 @@ export const Enemy = async ({ id, spawnRadius, targetPosition }) => {
         }
     });
 
+
     return Sprite({
         id,
         type: SPRITES.ENEMY,
-        x,
-        y,
+        x, y,
         dx: dx / distance * speed,
         dy: dy / distance * speed,
-        speed,
-        radius: 10,
+        speed, radius,
+        damage, hp,
         width: 32,
         height: 32,
         animations: spriteSheet.animations,
-        damage: 1,
-        hp: 10,
         lastHit: 0,
         nonColliding: false,
         render() {
