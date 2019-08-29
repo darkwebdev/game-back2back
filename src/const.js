@@ -1,12 +1,19 @@
+export const POINTERS = {
+    LEFT: 'left',
+    RIGHT: 'right'
+};
+
 export const SPRITES = {
     BULLET: 'bullet',
+    LASER: 'laser',
     PLAYER: 'player',
     ENEMY: 'enemy',
 };
 
 export const WEAPONS = {
     GUN: 'gun',
-    LASER: 'laser'
+    LASER: 'laser',
+    ROCKET: 'rocket'
 };
 
 export const STEPS = {

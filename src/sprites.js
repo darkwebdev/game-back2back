@@ -12,6 +12,7 @@ const Sprites = () => ({
     total: () => sprites.length,
 
     ofType: type => sprites.filter(sprite => sprite.type === type),
+    // findOfType: type => sprites.find(sprite => sprite.type === type),
 
     replace: newSprites => {
         sprites.length = 0;
@@ -20,11 +21,9 @@ const Sprites = () => ({
     },
 
     add: newSprites => {
-        if (Array.isArray(newSprites)) {
-            sprites.push(...newSprites)
-        } else {
-            sprites.push(newSprites)
-        }
+        // One or more sprites
+        const spritesArray = [].concat(newSprites);
+        sprites.push(...spritesArray);
         console.debug('->SPRITES ADD', s.total())
     },
 

@@ -1,7 +1,19 @@
 // Pythagorean law
+import { Vector } from 'kontra';
+
 export const normalized = (x, y) => Math.sqrt((x * x) + (y * y));
 
 export const degreesToRadians = degrees => degrees * Math.PI / 180;
+
+export const cos = sprite => Math.cos(sprite.rotation);
+export const sin = sprite => Math.sin(sprite.rotation);
+export const gunEnd = player => {
+    const gunLength = 12;
+    const x = player.x + cos(player) * gunLength;
+    const y = player.y + sin(player) * gunLength;
+
+    return Vector(x, y)
+};
 
 export const range = n => [...Array(n).keys()];
 

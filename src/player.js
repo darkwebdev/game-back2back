@@ -1,6 +1,7 @@
 import { Sprite } from 'kontra';
 import { SPRITES, WEAPONS } from './const'
 import { dpr } from './canvas';
+import { weapons } from './config';
 
 export const Player = ({ id, x, y, pointer, base }) => new Promise((resolve, reject) => {
     const image = new Image();
@@ -15,7 +16,7 @@ export const Player = ({ id, x, y, pointer, base }) => new Promise((resolve, rej
             rotation: 0,
             anchor: { x: 0.5, y: 0.5 },
             image,
-            weapon: WEAPONS.GUN,
+            weapon: weapons.default,
             hp: 20,
             base,
             update() {
@@ -42,3 +43,10 @@ export const Base = ({ id, x, y }) => new Promise((resolve, reject) => {
 });
 
 export const findPlayer = sprites => sprites.ofType(SPRITES.PLAYER)[0];
+
+export const useGun = player => {
+    player.weapon = WEAPONS.GUN
+};
+export const useLaser = player => {
+    player.weapon = WEAPONS.LASER
+};

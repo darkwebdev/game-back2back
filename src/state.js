@@ -1,10 +1,13 @@
 import sprites from './sprites'
 import { STEPS } from './const';
+import { waves } from './config';
 
 const state = {
     step: STEPS.REST,
-    timeTillWave: 2000,
-    waveSize: 1,
+    timeTillWave: waves.interval,
+    waveSize: waves.size,
+    waveSizeMultiplier: waves.multiplier,
+    lastFired: Infinity,
     sprites
 };
 

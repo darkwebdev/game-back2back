@@ -1,16 +1,23 @@
-import { GameLoop, emit, initPointer, onPointerDown, pointer } from 'kontra';
-import { Player, Base, findPlayer } from './player'
+import {
+    emit,
+    GameLoop,
+    bindKeys, initKeys,
+    initPointer, pointer, pointerPressed
+} from 'kontra';
+import { Base, findPlayer, Player, useGun, useLaser } from './player';
 import { findAllColliding, findColliding } from './helpers';
-import { findEnemies } from './enemy'
-import initEvents from './events'
-import { findBullets } from './bullet'
-import { ACTIONS, STEPS } from './const';
-import state from './state'
-import { canvas, dpr } from './canvas'
+import { findEnemies } from './enemy';
+import initEvents from './events';
+import { findBullets } from './bullet';
+import { ACTIONS, POINTERS, STEPS } from './const';
+import state from './state';
+import { canvas, dpr } from './canvas';
+import { weapons } from './config';
 
 (async () => {
     console.log('Initializing game engine...');
 
+    initKeys();
     initPointer();
     initEvents();
 
@@ -32,10 +39,6 @@ import { canvas, dpr } from './canvas'
     });
     emit(ACTIONS.ADD_SPRITES, player);
     emit(ACTIONS.SET_STEP, STEPS.REST);
-
-    onPointerDown((e, object) => {
-        emit(ACTIONS.FIRE);
-    });
 
     const loop = GameLoop({
         update() {
@@ -76,7 +79,20 @@ import { canvas, dpr } from './canvas'
                 if (state.timeTillWave) {
                     state.timeTillWave -= 10;
                 } else {
-                    emit(ACTIONS.SET_STEP, STEPS.WAVE)
+                    // emit(ACTIONS.SET_STEP, STEPS.WAVE)
+                }
+            }
+
+            // Input
+            if (player.isAlive() && pointerPressed(POINTERS.LEFT)) {
+                const weapon = weapons[player.weapon];
+
+                if (state.lastFired > weapon.shootingSpeed) {
+                    console.log('FIRE!!!!!')
+                    emit(ACTIONS.FIRE);
+                    state.lastFired = 0
+                } else {
+                    state.lastFired += 10
                 }
             }
 
@@ -89,5 +105,24 @@ import { canvas, dpr } from './canvas'
         }
     });
 
+    // Input
+    bindKeys('p', () => {
+        console.log('PAUSE');
+        loop.isStopped ? loop.start() : loop.stop();
+    });
+
+    bindKeys('l', () => {
+        console.log('WEAPON IS LASER');
+        useLaser(player)
+    });
+    bindKeys('g', () => {
+        console.log('WEAPON IS GUN');
+        useGun(player)
+    });
+    bindKeys('w', () => {
+        emit(ACTIONS.SET_STEP, STEPS.WAVE)
+    });
+
+    // Go-go-go!!
     loop.start()
 })();

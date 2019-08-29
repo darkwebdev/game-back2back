@@ -1,11 +1,15 @@
 import { emit, on, Vector } from 'kontra';
 import { Bullet, removeBullet } from './bullet';
+import {  Laser } from './laser';
 import { findPlayer } from './player';
-import { ACTIONS, STEPS } from './const';
+import { ACTIONS, STEPS, WEAPONS } from './const';
 import { dealDamage, stopSprite } from './helpers';
 import { hitEnemy, killEnemy, spawnEnemies } from './enemy';
 import state from './state';
-import { canvas, dpr } from './canvas'
+import { canvas, dpr } from './canvas';
+
+const canvasMaxRadius = Math.max(canvas.width, canvas.height) / 2;
+const canvasMinRadius = Math.min(canvas.width, canvas.height) / 2;
 
 export default () => {
     on(ACTIONS.ADD_SPRITES, state.sprites.add);
@@ -15,15 +19,24 @@ export default () => {
         if (!player) return;
 
         console.log('POP!');
-        const cos = Math.cos(player.rotation);
-        const sin = Math.sin(player.rotation);
-        const x = player.x + cos * 12;
-        const y = player.y + sin * 12;
+        switch(player.weapon) {
+            case WEAPONS.GUN:
+                emit(ACTIONS.ADD_SPRITES, Bullet({ owner: player }));
+                break;
 
-        emit(ACTIONS.ADD_SPRITES, Bullet({
-            position: Vector(x, y),
-            velocity: Vector(cos * 5, sin * 5)
-        }));
+            case WEAPONS.LASER: {
+                console.log('zzzzzz!')
+                emit(ACTIONS.ADD_SPRITES, Laser({
+                    owner: player,
+                    rayLength: canvasMaxRadius
+                }));
+                break;
+            }
+
+            case WEAPONS.ROCKET:
+                console.log('bam!')
+                break
+        }
     });
 
     on(ACTIONS.REMOVE_BULLET, removeBullet);
@@ -56,8 +69,8 @@ export default () => {
         switch(step) {
             case STEPS.WAVE: {
                 const player = findPlayer(state.sprites);
-                const waveSize = state.waveSize + 1;
-                const spawnRadius = Math.min(canvas.width, canvas.height) / 2 / dpr;
+                const waveSize = state.waveSize * state.waveSizeMultiplier;
+                const spawnRadius = canvasMinRadius / dpr;
 
                 emit(ACTIONS.NEW_WAVE, waveSize, spawnRadius, player);
                 state.waveSize = waveSize;

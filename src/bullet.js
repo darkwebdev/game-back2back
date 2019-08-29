@@ -1,19 +1,19 @@
-import { Sprite } from 'kontra';
-import { SPRITES } from './const'
+import { Sprite, Vector } from 'kontra';
+import { SPRITES, WEAPONS } from './const';
+import { cos, gunEnd, sin } from './helpers';
+import { weapons as config } from './config';
 
-export const Bullet = ({ position, velocity }) =>
-    Sprite({
+export const Bullet = ({ owner }) => {
+    const { x, y } = gunEnd(owner);
+    const { x: dx, y: dy } = Vector(cos(owner) * 5, sin(owner) * 5);
+    const { damage, ttl, color, width, height } = config[WEAPONS.GUN];
+
+    return Sprite({
         type: SPRITES.BULLET,
-        x: position.x,
-        y: position.y,
-        dx: velocity.x,
-        dy: velocity.y,
-        ttl: 50,
-        width: 2,
-        height: 2,
-        color: 'red',
-        damage: 10
+        x, y, dx, dy, width, height,
+        ttl, color, damage
     });
+};
 
 export const findBullets = sprites => sprites.ofType(SPRITES.BULLET);
 
